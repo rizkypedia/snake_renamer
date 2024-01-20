@@ -1,11 +1,17 @@
-from util import random_string
-
 import os
 import shutil
+from datetime import datetime, timezone, timedelta
+from time import time
+from util import random_string
 
-remove_file=False
 
-source=input('Enter a source directory: ')
+
+source=input('Enter a source directory: ') or 'N/A'
+
+if (source == 'N/A'):
+    print('No directory provided, exiting programm')
+    exit()
+   
 if (os.path.exists(source)==False):
     print("Source directory not find, exiting app. Bye")
     exit()    
@@ -13,8 +19,8 @@ if (os.path.exists(source)==False):
 destination=input('Enter a target directory: ')
 
 if not destination:
-    question=input("Do you want to copy the files in the same folder? (Y/N)")
-    if question=='N':    
+    question=input("Do you want to move the files in the same folder? (y) ") or 'y'
+    if question=='n':    
         destination=input('Plaese enter a target directory: ')
         if (os.path.exists(destination)==False):
             print("destination directory not find, exiting app. Bye")
@@ -28,18 +34,19 @@ else:
         exit()  
         
 
-remove_and_delete=input('Do you want to remove the original file after renaming? (Y/N)')
+keep_original_name=input('Do you want to keep the original name as suffix? (y) ') or 'y'
 
-if remove_and_delete == 'Y':
-    remove_file=True
+prefix = input('Define a file prefix for the filename e. g. MyFotos: ') or 'MyFotos'
 
 with os.scandir(source) as entries:
     for entry in entries:
-        str_random=random_string.id_generator(12)
+        if entry.name == '.DS_Store':
+            continue
         if entry.is_file():
-            renamed_file = str_random + '__' + entry.name
-            shutil.copy(source + "/" + entry.name, destination + "/" +renamed_file)
-            if remove_file==True and os.path.isfile(source + "/" + entry.name):
-                os.remove(source + "/" + entry.name)
-                                    
+            suffix = (datetime.now(timezone.utc) + timedelta(days=3)).timestamp() * 1e3
+            renamed_file = prefix + '__' + str(suffix).replace('.','') + '__' + entry.name
+            if keep_original_name =='n':
+                filename, filextension = os.path.splitext(entry.name)
+                renamed_file = prefix + '__' + str(suffix).replace('.','') + filextension
+            shutil.move(source + "/" + entry.name, destination + "/" + renamed_file)
 

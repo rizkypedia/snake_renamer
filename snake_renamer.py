@@ -4,8 +4,6 @@ from datetime import datetime, timezone, timedelta
 from time import time
 from util import random_string
 
-
-
 source=input('Enter a source directory: ') or 'N/A'
 
 if (source == 'N/A'):
@@ -13,7 +11,7 @@ if (source == 'N/A'):
     exit()
    
 if (os.path.exists(source)==False):
-    print("Source directory not find, exiting app. Bye")
+    print(f"Source directory {source} not found, exiting app. Bye")
     exit()    
     
 destination=input('Enter a target directory: ')
@@ -23,14 +21,14 @@ if not destination:
     if question=='n':    
         destination=input('Plaese enter a target directory: ')
         if (os.path.exists(destination)==False):
-            print("destination directory not find, exiting app. Bye")
+            print(f"destination directory {destination} not found, exiting app. Bye")
             exit()        
     else:
         destination = source
-        print("Source will be used as target directory")
+        print(f"Source {source} will be used as target directory")
 else:
     if (os.path.exists(destination)==False):
-        print("destination directory not find, exiting app. Bye")
+        print(f"destination directory {destination} not found, exiting app. Bye")
         exit()  
         
 
@@ -48,5 +46,6 @@ with os.scandir(source) as entries:
             if keep_original_name =='n':
                 filename, filextension = os.path.splitext(entry.name)
                 renamed_file = prefix + '__' + str(suffix).replace('.','') + filextension
+            print(f"Copying / moving {source}/{entry.name} to {destination}/{renamed_file}")
             shutil.move(source + "/" + entry.name, destination + "/" + renamed_file)
 
